@@ -1,9 +1,6 @@
-// telegram.js - Отправка заявок в Telegram
+// telegram.js - Отправка заявок в Telegram для English by_M
 const BOT_TOKEN = '8506286493:AAE-mPIm05vH_KLPQ4mTdoPPlWj3gl4G-YM';
 const CHAT_ID = '8455664873';
-
-// НЕ объявляем currentLang здесь - она уже есть в language.js
-// let currentLang = 'uz'; // <-- УДАЛИТЬ ЭТУ СТРОКУ!
 
 // Функция отправки в Telegram
 async function sendToTelegram(formData) {
@@ -15,7 +12,7 @@ async function sendToTelegram(formData) {
     // Форматируем сообщение
     const message = formatTelegramMessage(formData);
     
-    // URL для отправки
+    // URL для отправки с CORS прокси
     const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
     
     try {
@@ -35,7 +32,7 @@ async function sendToTelegram(formData) {
         const data = await response.json();
         
         if (data.ok) {
-            console.log('✅ Заявка отправлена в Telegram:', data.result.message_id);
+            console.log('✅ Заявка отправлена в Telegram от English by_M');
             return true;
         } else {
             console.error('❌ Ошибка Telegram:', data.description);
@@ -43,36 +40,68 @@ async function sendToTelegram(formData) {
         }
     } catch (error) {
         console.error('❌ Ошибка сети:', error);
-        return false;
+        
+        // Альтернативный метод через прокси
+        try {
+            return await sendViaProxy(formData);
+        } catch (proxyError) {
+            console.error('❌ Ошибка прокси:', proxyError);
+            return false;
+        }
     }
 }
 
-// Форматирование сообщения
+// Альтернативная отправка через прокси (если CORS блокирует)
+async function sendViaProxy(formData) {
+    const message = formatTelegramMessage(formData);
+    const proxyUrl = `https://corsproxy.io/?https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+    
+    const response = await fetch(proxyUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: message,
+            parse_mode: 'HTML'
+        })
+    });
+    
+    const data = await response.json();
+    return data.ok;
+}
+
+// Форматирование сообщения для English by_M
 function formatTelegramMessage(data) {
-    // Получаем currentLang из глобальной области
     const lang = window.currentLang || 'uz';
     const time = new Date().toLocaleString('uz-UZ', {
         timeZone: 'Asia/Tashkent',
-        hour12: false
+        hour12: false,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
     });
     
     if (lang === 'ru') {
-        return `📥 <b>НОВАЯ ЗАЯВКА С САЙТА</b>\n\n` +
+        return `🎓 <b>НОВАЯ ЗАЯВКА - English by_M</b>\n\n` +
                `👤 <b>Имя:</b> ${data.name}\n` +
                `📞 <b>Телефон:</b> <code>${data.phone}</code>\n` +
-               `🎓 <b>Курс:</b> ${data.course}\n` +
+               `🎯 <b>Курс:</b> ${data.course}\n` +
                `🌍 <b>Язык сайта:</b> Русский\n` +
                `⏰ <b>Время:</b> ${time}\n` +
-               `🔗 <b>Источник:</b> ${window.location.href}\n\n` +
+               `🔗 <b>Сайт:</b> English by_M\n\n` +
                `🚀 <i>Свяжитесь в течение 10 минут!</i>`;
     } else {
-        return `📥 <b>SAYTDAN YANGI ARIZA</b>\n\n` +
+        return `🎓 <b>YANGI ARIZA - English by_M</b>\n\n` +
                `👤 <b>Ism:</b> ${data.name}\n` +
                `📞 <b>Telefon:</b> <code>${data.phone}</code>\n` +
-               `🎓 <b>Kurs:</b> ${data.course}\n` +
+               `🎯 <b>Kurs:</b> ${data.course}\n` +
                `🌍 <b>Sayt tili:</b> O'zbek\n` +
                `⏰ <b>Vaqt:</b> ${time}\n` +
-               `🔗 <b>Manba:</b> ${window.location.href}\n\n` +
+               `🔗 <b>Sayt:</b> English by_M\n\n` +
                `🚀 <i>10 daqiqa ichida aloqaga chiqing!</i>`;
     }
 }
@@ -112,12 +141,12 @@ function showNotification(message, type = 'success') {
     });
 }
 
-// Обработчик формы
+// Обработчик формы для English by_M
 function setupFormHandler() {
     const form = document.getElementById('contactForm');
     
     if (!form) {
-        console.error('❌ Форма не найдена!');
+        console.error('❌ Форма не найдена на сайте English by_M!');
         return;
     }
     
@@ -129,7 +158,7 @@ function setupFormHandler() {
     newForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Получаем currentLang из глобальной области
+        // Получаем текущий язык
         const currentLang = window.currentLang || 'uz';
         
         // Получаем данные формы
@@ -138,7 +167,8 @@ function setupFormHandler() {
             phone: document.getElementById('phone').value.trim(),
             course: document.getElementById('course').value,
             lang: currentLang,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            source: 'English by_M Website'
         };
         
         // Валидация
@@ -152,11 +182,11 @@ function setupFormHandler() {
             return;
         }
         
-        if (!formData.phone || formData.phone.length < 5) {
+        if (!formData.phone || formData.phone.replace(/\D/g, '').length < 9) {
             showNotification(
                 currentLang === 'uz' 
-                    ? '❌ Iltimos, telefon raqamingizni kiriting' 
-                    : '❌ Пожалуйста, введите номер телефона',
+                    ? '❌ Iltimos, to\'g\'ri telefon raqam kiriting' 
+                    : '❌ Пожалуйста, введите корректный номер телефона',
                 'error'
             );
             return;
@@ -175,9 +205,7 @@ function setupFormHandler() {
         // Визуальная обратная связь
         const submitBtn = this.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
-        const originalWidth = submitBtn.offsetWidth;
         
-        submitBtn.style.width = `${originalWidth}px`;
         submitBtn.innerHTML = currentLang === 'uz' 
             ? '<i class="fas fa-spinner fa-spin"></i> Yuborilmoqda...' 
             : '<i class="fas fa-spinner fa-spin"></i> Отправляем...';
@@ -190,19 +218,22 @@ function setupFormHandler() {
         if (success) {
             showNotification(
                 currentLang === 'uz' 
-                    ? '✅ Arizangiz qabul qilindi! 5-10 daqiqa ichida aloqaga chiqamiz.' 
-                    : '✅ Заявка принята! Свяжемся в течение 5-10 минут.',
+                    ? '✅ English by_M: Ariza qabul qilindi! 5-10 daqiqa ichida aloqaga chiqamiz.' 
+                    : '✅ English by_M: Заявка принята! Свяжемся в течение 5-10 минут.',
                 'success'
             );
             
             // Очищаем форму
             this.reset();
             document.getElementById('course').selectedIndex = 0;
+            
+            // Сохраняем в localStorage (резервное копирование)
+            saveToLocalStorage(formData);
         } else {
             showNotification(
                 currentLang === 'uz' 
-                    ? '❌ Xatolik yuz berdi. Iltimos, telefon orqali bog\'laning.' 
-                    : '❌ Ошибка отправки. Позвоните, пожалуйста.',
+                    ? '❌ Xatolik yuz berdi. Iltimos, telefon orqali bog\'laning: +998 (XX) XXX-XX-XX' 
+                    : '❌ Ошибка отправки. Позвоните, пожалуйста: +998 (XX) XXX-XX-XX',
                 'error'
             );
         }
@@ -210,38 +241,29 @@ function setupFormHandler() {
         // Восстанавливаем кнопку
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
-        submitBtn.style.width = '';
     });
 }
 
-// Обновляем currentLang при переключении языка
-function updateCurrentLang(lang) {
-    window.currentLang = lang;
-}
-
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    // Инициализируем глобальную переменную
-    window.currentLang = window.currentLang || 'uz';
-    
-    // Настраиваем обработчик формы
-    setupFormHandler();
-    
-    // Мониторим переключение языка
-    const langToggle = document.getElementById('langToggle');
-    if (langToggle) {
-        langToggle.addEventListener('click', function() {
-            // Обновляем currentLang после переключения
-            setTimeout(() => {
-                const langText = document.getElementById('currentLang').textContent;
-                window.currentLang = langText.toLowerCase();
-            }, 100);
+// Сохранение в localStorage (резерв)
+function saveToLocalStorage(formData) {
+    try {
+        const saved = JSON.parse(localStorage.getItem('englishbym_requests') || '[]');
+        saved.push({
+            ...formData,
+            savedAt: new Date().toISOString()
         });
+        
+        // Храним только последние 20 заявок
+        if (saved.length > 20) {
+            saved = saved.slice(-20);
+        }
+        
+        localStorage.setItem('englishbym_requests', JSON.stringify(saved));
+        console.log('✅ Заявка сохранена в localStorage для English by_M');
+    } catch (error) {
+        console.error('❌ Ошибка сохранения в localStorage:', error);
     }
-    
-    // Проверяем доступность бота (опционально)
-    checkBotAvailability();
-});
+}
 
 // Проверка доступности бота
 async function checkBotAvailability() {
@@ -250,18 +272,43 @@ async function checkBotAvailability() {
         const data = await response.json();
         
         if (data.ok) {
-            console.log(`✅ Бот активен: @${data.result.username}`);
+            console.log(`✅ Бот English by_M активен: @${data.result.username}`);
+            return true;
         } else {
-            console.error('❌ Бот не доступен:', data.description);
+            console.error('❌ Бот English by_M не доступен:', data.description);
+            return false;
         }
     } catch (error) {
-        console.error('❌ Ошибка проверки бота:', error);
+        console.error('❌ Ошибка проверки бота English by_M:', error);
+        return false;
     }
 }
 
-// Экспортируем функции для использования в других файлах
+// Инициализация
+document.addEventListener('DOMContentLoaded', function() {
+    // Настраиваем обработчик формы
+    setupFormHandler();
+    
+    // Проверяем бота при загрузке
+    setTimeout(checkBotAvailability, 2000);
+    
+    // Мониторим переключение языка
+    const langToggle = document.getElementById('langToggle');
+    if (langToggle) {
+        langToggle.addEventListener('click', function() {
+            // Обновляем языковую переменную
+            setTimeout(() => {
+                const langText = document.getElementById('currentLang').textContent;
+                window.currentLang = langText.toLowerCase();
+            }, 100);
+        });
+    }
+    
+    console.log('✅ Telegram system loaded for English by_M');
+});
+
+// Экспортируем функции
 if (typeof window !== 'undefined') {
     window.sendToTelegram = sendToTelegram;
     window.showNotification = showNotification;
-    window.updateCurrentLang = updateCurrentLang;
 }
