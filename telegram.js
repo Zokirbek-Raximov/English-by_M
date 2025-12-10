@@ -1,6 +1,6 @@
 // telegram.js - Отправка заявок в Telegram для English by_M
 const BOT_TOKEN = '8506286493:AAE-mPIm05vH_KLPQ4mTdoPPlWj3gl4G-YM';
-const CHAT_ID = '8455664873';
+const CHAT_ID = '-1003273735145'; // Ваш ID группы;
 
 // Функция отправки в Telegram
 async function sendToTelegram(formData) {
