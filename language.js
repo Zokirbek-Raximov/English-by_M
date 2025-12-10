@@ -291,3 +291,24 @@ document.addEventListener('DOMContentLoaded', function() {
             ? `© ${new Date().getFullYear()} "Progress" O'quv Markazi. Barcha huquqlar himoyalangan.`
             : `© ${new Date().getFullYear()} Учебный Центр "Прогресс". Все права защищены.`;
 });
+// После всего кода в language.js добавьте:
+
+// Экспортируем функцию смены языка для telegram.js
+function setCurrentLanguage(lang) {
+    currentLang = lang;
+    
+    // Если telegram.js загружен, обновляем его
+    if (typeof window.updateCurrentLang === 'function') {
+        window.updateCurrentLang(lang);
+    }
+}
+
+// Обновляем функцию translatePage
+const originalTranslatePage = translatePage;
+translatePage = function(lang) {
+    originalTranslatePage(lang);
+    setCurrentLanguage(lang);
+};
+
+// Инициализируем язык
+setCurrentLanguage(currentLang);
