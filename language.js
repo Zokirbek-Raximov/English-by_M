@@ -312,3 +312,17 @@ translatePage = function(lang) {
 
 // Инициализируем язык
 setCurrentLanguage(currentLang);
+// Делаем currentLang глобальной переменной
+window.currentLang = currentLang;
+
+// Обновляем функцию смены языка
+const originalTranslatePage = translatePage;
+translatePage = function(lang) {
+    originalTranslatePage(lang);
+    window.currentLang = lang; // Обновляем глобальную переменную
+    
+    // Если telegram.js загружен, обновляем его
+    if (typeof window.updateCurrentLang === 'function') {
+        window.updateCurrentLang(lang);
+    }
+};
