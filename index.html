@@ -1,15 +1,146 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <title>Мой сайт</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qabul boshlandi</title>
     <style>
-        body { font-family: Arial; text-align: center; padding: 50px; }
-        h1 { color: #4CAF50; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: #FFD000;
+            padding: 25px;
+            text-align: left;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+        }
+
+        .header .icon {
+            margin-right: 10px;
+        }
+
+        .content {
+            display: flex;
+            padding: 30px;
+        }
+
+        .left {
+            width: 65%;
+            background: #FF8A00;
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .left h2 {
+            margin-top: 0;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .list-item {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            font-size: 22px;
+        }
+
+        .check {
+            color: white;
+            background: #FFCC80;
+            padding: 4px 8px;
+            border-radius: 5px;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .phone {
+            margin-top: 25px;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .warning {
+            margin-top: 15px;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .right {
+            width: 35%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .right img {
+            width: 95%;
+            max-width: 320px;
+        }
+
+        /* Responsive for phone */
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            .left, .right {
+                width: 100%;
+            }
+            .left {
+                margin-bottom: 20px;
+            }
+            .header {
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>Привет! Это мой первый сайт</h1>
-    <p>Сделан полностью бесплатно!</p>
+
+<div class="container">
+    <div class="header">
+        🔔 QABUL BOSHLANDI
+    </div>
+
+    <div class="content">
+        <div class="left">
+            <h2>Kurslar:</h2>
+
+            <div class="list-item"><span class="check">✔</span> IELTS / CEFR</div>
+            <div class="list-item"><span class="check">✔</span> General English</div>
+            <div class="list-item"><span class="check">✔</span> Prezident maktabiga tayyorgarlik</div>
+
+            <div class="phone">
+                Murojaat uchun <br>
+                +998 94 919 06 66
+            </div>
+
+            <div class="warning">
+                Shoshiling! Joylar soni cheklangan
+            </div>
+        </div>
+
+        <div class="right">
+            <img src="https://i.imgur.com/2lXKOUD.png" alt="education image">
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
