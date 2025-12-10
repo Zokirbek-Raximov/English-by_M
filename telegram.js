@@ -1,38 +1,43 @@
-// telegram.js - ИСПРАВЛЕННЫЙ КОД С РАБОЧИМИ ID
+// telegram.js - РАБОЧАЯ ВЕРСИЯ ДЛЯ ENGLISH BY M
 
 const BOT_TOKEN = '8506286493:AAE-mPIm05vH_KLPQ4mTdoPPlWj3gl4G-YM';
 
-// РАБОЧИЕ CHAT_ID (из вашего сообщения)
-const CHAT_IDS = [
+// ПРАВИЛЬНЫЕ CHAT_ID (с минусом для группы!)
+const WORKING_CHAT_IDS = [
     '-1003273735145',  // ✅ Группа "Nomzodlar zapros boyicha" (ОСНОВНОЙ)
-    '8455664873'       // ✅ Ваш личный чат (дополнительно)
+    '8455664873'       // ✅ Ваш личный чат
 ];
 
-// Основная функция отправки - отправляем во ВСЕ чаты
+// Основная функция отправки
 async function sendToTelegram(formData) {
+    console.log('📤 Начинаем отправку заявки в Telegram...');
+    
     if (!formData.name || !formData.phone || !formData.course) {
+        console.error('❌ Не все поля заполнены');
         return false;
     }
     
     const message = formatTelegramMessage(formData);
-    let atLeastOneSuccess = false;
+    let successCount = 0;
     
-    console.log('📤 Отправляем заявку в Telegram...');
-    
-    // Отправляем во все указанные чаты
-    for (const chatId of CHAT_IDS) {
-        const success = await sendToSingleChat(chatId, message);
-        if (success) {
-            atLeastOneSuccess = true;
-            console.log(`✅ Успешно отправлено в чат: ${chatId}`);
+    // Отправляем во все рабочие чаты
+    for (const chatId of WORKING_CHAT_IDS) {
+        try {
+            const success = await sendToChat(chatId, message);
+            if (success) {
+                successCount++;
+                console.log(`✅ Отправлено в ${chatId}`);
+            }
+        } catch (error) {
+            console.warn(`⚠️ Ошибка при отправке в ${chatId}:`, error.message);
         }
     }
     
-    return atLeastOneSuccess;
+    return successCount > 0; // Успех, если хотя бы в один чат отправлено
 }
 
-// Отправка в один конкретный чат
-async function sendToSingleChat(chatId, message) {
+// Отправка в конкретный чат
+async function sendToChat(chatId, message) {
     const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
     
     try {
@@ -45,6 +50,7 @@ async function sendToSingleChat(chatId, message) {
                 chat_id: chatId,
                 text: message,
                 parse_mode: 'HTML',
+                disable_web_page_preview: false,
                 disable_notification: false
             })
         });
@@ -52,40 +58,15 @@ async function sendToSingleChat(chatId, message) {
         const data = await response.json();
         
         if (data.ok) {
-            console.log(`📨 Сообщение отправлено в ${chatId}, ID: ${data.result.message_id}`);
+            console.log(`📨 Сообщение #${data.result.message_id} отправлено в ${getChatName(chatId)}`);
             return true;
         } else {
-            console.warn(`⚠️ Ошибка для ${chatId}:`, data.description);
+            console.warn(`⚠️ Telegram ошибка для ${chatId}:`, data.description);
             return false;
         }
     } catch (error) {
-        console.error(`❌ Сетевая ошибка для ${chatId}:`, error);
+        console.error(`❌ Сетевая ошибка:`, error);
         return false;
-    }
-}
-
-// Тестовая функция для проверки
-async function testTelegramConnection() {
-    console.log('🧪 Тестируем подключение к Telegram...');
-    
-    for (const chatId of CHAT_IDS) {
-        console.log(`Проверяем чат: ${chatId}`);
-        
-        const testUrl = `https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${chatId}`;
-        
-        try {
-            const response = await fetch(testUrl);
-            const data = await response.json();
-            
-            if (data.ok) {
-                console.log(`✅ Чат доступен: ${data.result.title || 'Личный чат'}`);
-                console.log(`   Тип: ${data.result.type}`);
-            } else {
-                console.warn(`❌ Чат недоступен: ${data.description}`);
-            }
-        } catch (error) {
-            console.error(`❌ Ошибка проверки:`, error);
-        }
     }
 }
 
@@ -98,8 +79,7 @@ function formatTelegramMessage(data) {
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
+        minute: '2-digit'
     });
     
     if (lang === 'ru') {
@@ -109,11 +89,10 @@ function formatTelegramMessage(data) {
                `🎯 <b>Курс:</b> ${data.course}\n` +
                `🌍 <b>Язык сайта:</b> Русский\n` +
                `⏰ <b>Время:</b> ${time}\n` +
-               `📍 <b>Адрес:</b> Gazalkent, Musiqa va san'at maktabi\n` +
-               `🔗 <b>Сайт:</b> English by M\n\n` +
-               `🚀 <i>Свяжитесь в течение 10 минут!</i>\n` +
+               `📍 <b>Адрес:</b> Gazalkent, Musiqa va san'at maktabi\n\n` +
+               `🚀 <i>Свяжитесь в течение 10 минут!</i>\n\n` +
                `📱 <a href="tel:${data.phone}">Позвонить</a> | ` +
-               `<a href="https://wa.me/998949190666?text=Здравствуйте! Я оставлял заявку: ${encodeURIComponent(data.name)}">WhatsApp</a>`;
+               `<a href="https://wa.me/998949190666?text=Здравствуйте! Я ${encodeURIComponent(data.name)}, оставлял заявку на курс ${encodeURIComponent(data.course)}">WhatsApp</a>`;
     } else {
         return `🎓 <b>YANGI ARIZA - English by M</b>\n\n` +
                `👤 <b>Ism:</b> ${data.name}\n` +
@@ -121,21 +100,25 @@ function formatTelegramMessage(data) {
                `🎯 <b>Kurs:</b> ${data.course}\n` +
                `🌍 <b>Sayt tili:</b> O'zbek\n` +
                `⏰ <b>Vaqt:</b> ${time}\n` +
-               `📍 <b>Manzil:</b> Gazalkent, Musiqa va san'at maktabi\n` +
-               `🔗 <b>Sayt:</b> English by M\n\n` +
-               `🚀 <i>10 daqiqa ichida aloqaga chiqing!</i>\n` +
+               `📍 <b>Manzil:</b> Gazalkent, Musiqa va san'at maktabi\n\n` +
+               `🚀 <i>10 daqiqa ichida aloqaga chiqing!</i>\n\n` +
                `📱 <a href="tel:${data.phone}">Qo'ng'iroq qilish</a> | ` +
-               `<a href="https://wa.me/998949190666?text=Assalomu alaykum! Men ariza qoldirdim: ${encodeURIComponent(data.name)}">WhatsApp</a>`;
+               `<a href="https://wa.me/998949190666?text=Assalomu alaykum! Men ${encodeURIComponent(data.name)}, "${encodeURIComponent(data.course)}" kursiga ariza qoldirdim">WhatsApp</a>`;
     }
 }
 
-// Функция показа уведомления
-function showNotification(message, type = 'success') {
-    // Удаляем старые уведомления
-    const oldNotifications = document.querySelectorAll('.notification');
-    oldNotifications.forEach(n => n.remove());
-    
-    // Создаем новое уведомление
+// Вспомогательная функция для имени чата
+function getChatName(chatId) {
+    switch(chatId) {
+        case '-1003273735145': return 'Группа "Nomzodlar"';
+        case '8455664873': return 'Личный чат Zokirbek';
+        default: return chatId;
+    }
+}
+
+// Функция показа уведомления на сайте
+function showSiteNotification(message, type = 'success') {
+    // Создаем элемент уведомления
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -164,57 +147,75 @@ function showNotification(message, type = 'success') {
     });
 }
 
+// Простая проверка подключения
+async function checkTelegramConnection() {
+    console.log('🔍 Проверяем подключение к Telegram...');
+    
+    // Просто проверяем бота
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/getMe`;
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.ok) {
+            console.log(`✅ Бот активен: @${data.result.username}`);
+            console.log(`📊 Готов к отправке в ${WORKING_CHAT_IDS.length} чата(ов)`);
+            return true;
+        } else {
+            console.error('❌ Бот недоступен:', data.description);
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Ошибка сети:', error);
+        return false;
+    }
+}
+
 // Обработчик формы
 function setupFormHandler() {
     const form = document.getElementById('contactForm');
     
     if (!form) {
-        console.error('❌ Форма не найдена!');
+        console.error('❌ Форма не найдена на странице');
         return;
     }
     
-    // Удаляем старые обработчики
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-    
-    // Добавляем новый обработчик
-    newForm.addEventListener('submit', async function(e) {
+    form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        // Получаем данные
         const currentLang = window.currentLang || 'uz';
-        
-        // Получаем данные формы
         const formData = {
             name: document.getElementById('name').value.trim(),
             phone: document.getElementById('phone').value.trim(),
             course: document.getElementById('course').value,
-            lang: currentLang,
-            timestamp: new Date().toISOString()
+            lang: currentLang
         };
         
-        // Валидация
+        // Простая валидация
         if (!formData.name || formData.name.length < 2) {
-            showNotification(
+            showSiteNotification(
                 currentLang === 'uz' 
-                    ? '❌ Iltimos, ismingizni kiriting (kamida 2 harf)' 
-                    : '❌ Пожалуйста, введите имя (минимум 2 буквы)',
+                    ? '❌ Iltimos, ismingizni kiriting' 
+                    : '❌ Пожалуйста, введите имя',
                 'error'
             );
             return;
         }
         
-        if (!formData.phone || formData.phone.replace(/\D/g, '').length < 9) {
-            showNotification(
+        if (!formData.phone || formData.phone.length < 5) {
+            showSiteNotification(
                 currentLang === 'uz' 
-                    ? '❌ Iltimos, to\'g\'ri telefon raqam kiriting' 
-                    : '❌ Пожалуйста, введите корректный номер телефона',
+                    ? '❌ Iltimos, telefon raqamingizni kiriting' 
+                    : '❌ Пожалуйста, введите номер телефона',
                 'error'
             );
             return;
         }
         
         if (!formData.course) {
-            showNotification(
+            showSiteNotification(
                 currentLang === 'uz' 
                     ? '❌ Iltimos, kursni tanlang' 
                     : '❌ Пожалуйста, выберите курс',
@@ -223,10 +224,9 @@ function setupFormHandler() {
             return;
         }
         
-        // Визуальная обратная связь
+        // Показываем индикатор загрузки
         const submitBtn = this.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
-        
         submitBtn.innerHTML = currentLang === 'uz' 
             ? '<i class="fas fa-spinner fa-spin"></i> Yuborilmoqda...' 
             : '<i class="fas fa-spinner fa-spin"></i> Отправляем...';
@@ -235,26 +235,23 @@ function setupFormHandler() {
         // Отправляем в Telegram
         const success = await sendToTelegram(formData);
         
-        // Показываем результат
+        // Обрабатываем результат
         if (success) {
-            showNotification(
+            showSiteNotification(
                 currentLang === 'uz' 
-                    ? '✅ English by M: Ariza qabul qilindi! 5-10 daqiqa ichida aloqaga chiqamiz.' 
-                    : '✅ English by M: Заявка принята! Свяжемся в течение 5-10 минут.',
+                    ? '✅ Arizangiz qabul qilindi! Tez orada aloqaga chiqamiz.' 
+                    : '✅ Заявка принята! Скоро с вами свяжемся.',
                 'success'
             );
             
             // Очищаем форму
             this.reset();
             document.getElementById('course').selectedIndex = 0;
-            
-            // Сохраняем в localStorage (резерв)
-            saveToLocalStorage(formData);
         } else {
-            showNotification(
+            showSiteNotification(
                 currentLang === 'uz' 
-                    ? '❌ Xatolik yuz berdi. Iltimos, telefon orqali bog\'laning: +998 94 919-06-66' 
-                    : '❌ Ошибка отправки. Позвоните, пожалуйста: +998 94 919-06-66',
+                    ? '❌ Iltimos, telefon orqali bog\'laning: +998 94 919-06-66' 
+                    : '❌ Пожалуйста, позвоните: +998 94 919-06-66',
                 'error'
             );
         }
@@ -265,42 +262,20 @@ function setupFormHandler() {
     });
 }
 
-// Сохранение в localStorage (резерв)
-function saveToLocalStorage(formData) {
-    try {
-        const saved = JSON.parse(localStorage.getItem('englishbym_requests') || '[]');
-        saved.push({
-            ...formData,
-            savedAt: new Date().toISOString(),
-            sentToTelegram: true
-        });
-        
-        // Храним только последние 50 заявок
-        if (saved.length > 50) {
-            saved = saved.slice(-50);
-        }
-        
-        localStorage.setItem('englishbym_requests', JSON.stringify(saved));
-        console.log('✅ Заявка сохранена в localStorage');
-    } catch (error) {
-        console.error('❌ Ошибка сохранения:', error);
-    }
-}
-
 // Инициализация
 document.addEventListener('DOMContentLoaded', function() {
-    // Настраиваем обработчик формы
+    console.log('🚀 Инициализируем Telegram систему...');
+    
+    // Настраиваем форму
     setupFormHandler();
     
-    // Тестируем подключение при загрузке
+    // Проверяем подключение
     setTimeout(() => {
-        testTelegramConnection();
-    }, 2000);
+        checkTelegramConnection();
+    }, 1000);
     
-    // Показываем информацию о боте
-    console.log('🤖 Бот: @english_by_m_bot');
-    console.log('👤 Личный chat_id: 8455664873');
-    console.log('👥 Группа chat_id: -1003273735145');
-    console.log('📝 Группа: "Nomzodlar zapros boyicha"');
-    console.log('✅ Telegram system loaded for English by M');
+    console.log('✅ Telegram система готова к работе!');
+    console.log('📋 Будет отправлять в:');
+    console.log('  1. Группу: "-1003273735145" (Nomzodlar zapros boyicha)');
+    console.log('  2. Личный чат: "8455664873"');
 });
