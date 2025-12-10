@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Учебный Центр "Прогресс" | Качественное образование</title>
+    <title>O'quv Markazi "Progress" | Sifatli ta'lim</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,25 +11,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Шапка сайта -->
+    <!-- Шапка с переключателем языка -->
     <header class="header">
         <div class="container header-container">
             <div class="logo">
                 <a href="#">
                     <i class="fas fa-graduation-cap logo-icon"></i>
-                    <span class="logo-text">УЦ <strong>Прогресс</strong></span>
+                    <span class="logo-text">OM <strong>Progress</strong></span>
                 </a>
             </div>
             <nav class="nav">
                 <ul class="nav-list">
-                    <li><a href="#home">Главная</a></li>
-                    <li><a href="#about">О нас</a></li>
-                    <li><a href="#directions">Направления</a></li>
-                    <li><a href="#teachers">Преподаватели</a></li>
-                    <li><a href="#contacts">Контакты</a></li>
+                    <li><a href="#home" data-i18n="nav.home">Bosh sahifa</a></li>
+                    <li><a href="#about" data-i18n="nav.about">Biz haqimizda</a></li>
+                    <li><a href="#directions" data-i18n="nav.directions">Yo'nalishlar</a></li>
+                    <li><a href="#teachers" data-i18n="nav.teachers">O'qituvchilar</a></li>
+                    <li><a href="#contacts" data-i18n="nav.contacts">Aloqa</a></li>
                 </ul>
             </nav>
-            <a href="#contacts" class="btn btn-header">Записаться</a>
+            <div class="header-right">
+                <div class="language-switcher">
+                    <button id="langToggle" class="lang-btn">
+                        <span id="currentLang">UZ</span>
+                        <i class="fas fa-globe"></i>
+                    </button>
+                </div>
+                <a href="#contacts" class="btn btn-header" data-i18n="nav.apply">Ro'yxatdan o'tish</a>
+            </div>
         </div>
     </header>
 
@@ -37,15 +45,15 @@
     <section class="hero" id="home">
         <div class="container hero-container">
             <div class="hero-content">
-                <h1 class="hero-title">Образование, которое открывает двери</h1>
-                <p class="hero-text">Профессиональные курсы с практической направленностью. Подготовим к карьере, экзаменам или поможем освоить новую профессию с нуля.</p>
+                <h1 class="hero-title" data-i18n="hero.title">Eshik ochadigan ta'lim</h1>
+                <p class="hero-text" data-i18n="hero.text">Amaliy yo'nalishdagi professional kurslar. Karyera, imtihonlarga tayyorlaymiz yoki yangi kasbni noldan o'rganishga yordam beramiz.</p>
                 <div class="hero-buttons">
-                    <a href="#directions" class="btn btn-primary">Выбрать курс</a>
-                    <a href="#contacts" class="btn btn-secondary">Бесплатная консультация</a>
+                    <a href="#directions" class="btn btn-primary" data-i18n="hero.btn_course">Kursni tanlash</a>
+                    <a href="#contacts" class="btn btn-secondary" data-i18n="hero.btn_consult">Bepul maslahat</a>
                 </div>
             </div>
             <div class="hero-image">
-                <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Студенты в аудитории">
+                <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Auditoriyadagi talabalar">
             </div>
         </div>
     </section>
@@ -53,35 +61,35 @@
     <!-- О нас -->
     <section class="about section" id="about">
         <div class="container">
-            <h2 class="section-title">Почему выбирают нас?</h2>
+            <h2 class="section-title" data-i18n="about.title">Nima uchun bizni tanlashadi?</h2>
             <div class="features">
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-chalkboard-teacher"></i>
                     </div>
-                    <h3>Опытные педагоги</h3>
-                    <p>Преподаватели-практики с опытом работы более 5 лет в своей сфере.</p>
+                    <h3 data-i18n="about.feature1.title">Tajribali o'qituvchilar</h3>
+                    <p data-i18n="about.feature1.text">5 yildan ortiq amaliy tajribaga ega mutaxassislar.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-file-certificate"></i>
                     </div>
-                    <h3>Сертификат по окончании</h3>
-                    <p>Выдаём официальный сертификат, подтверждающий ваши новые навыки.</p>
+                    <h3 data-i18n="about.feature2.title">Bitiruvda sertifikat</h3>
+                    <p data-i18n="about.feature2.text">Yangilaringizni tasdiqlovchi rasmiy sertifikat beramiz.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h3>Малые группы</h3>
-                    <p>Занятия в группах 6-8 человек для максимального внимания каждому.</p>
+                    <h3 data-i18n="about.feature3.title">Kichik guruhlar</h3>
+                    <p data-i18n="about.feature3.text">Har biriga maksimal e'tibor - 6-8 kishilik guruhlarda.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-laptop-code"></i>
                     </div>
-                    <h3>Практика с 1-го дня</h3>
-                    <p>80% времени — решение реальных задач и отработка навыков.</p>
+                    <h3 data-i18n="about.feature4.title">1-kundan amaliyot</h3>
+                    <p data-i18n="about.feature4.text">Vaqtning 80% - real vazifalar va ko'nikmalarni rivojlantirish.</p>
                 </div>
             </div>
         </div>
@@ -90,8 +98,8 @@
     <!-- Направления обучения -->
     <section class="directions section" id="directions">
         <div class="container">
-            <h2 class="section-title">Направления обучения</h2>
-            <p class="section-subtitle">Выберите курс, который соответствует вашим целям</p>
+            <h2 class="section-title" data-i18n="directions.title">O'quv yo'nalishlari</h2>
+            <p class="section-subtitle" data-i18n="directions.subtitle">Maqsadlaringizga mos kursni tanlang</p>
             <div class="directions-container" id="directionsContainer">
                 <!-- Направления будут добавляться здесь JavaScript -->
             </div>
@@ -101,25 +109,25 @@
     <!-- Преподаватели -->
     <section class="teachers section" id="teachers">
         <div class="container">
-            <h2 class="section-title">Наши преподаватели</h2>
+            <h2 class="section-title" data-i18n="teachers.title">Bizning o'qituvchilar</h2>
             <div class="teachers-grid">
                 <div class="teacher-card">
-                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Анна Петрова">
-                    <h3>Анна Петрова</h3>
-                    <p class="teacher-subject">Английский язык, IELTS</p>
-                    <p>Лингвист, опыт 10 лет, сертификат CELTA.</p>
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Anna Petrova">
+                    <h3>Anna Petrova</h3>
+                    <p class="teacher-subject" data-i18n="teachers.teacher1.subject">Ingliz tili, IELTS</p>
+                    <p data-i18n="teachers.teacher1.info">Lingvist, 10 yillik tajriba, CELTA sertifikati.</p>
                 </div>
                 <div class="teacher-card">
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Максим Иванов">
-                    <h3>Максим Иванов</h3>
-                    <p class="teacher-subject">Программирование, Python</p>
-                    <p>Senior Developer, ведёт курсы для начинающих.</p>
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Maksim Ivanov">
+                    <h3>Maksim Ivanov</h3>
+                    <p class="teacher-subject" data-i18n="teachers.teacher2.subject">Dasturlash, Python</p>
+                    <p data-i18n="teachers.teacher2.info">Senior Developer, yangi boshlanuvchilar uchun kurslar olib boradi.</p>
                 </div>
                 <div class="teacher-card">
-                    <img src="https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Елена Смирнова">
-                    <h3>Елена Смирнова</h3>
-                    <p class="teacher-subject">Дизайн, UI/UX, Figma</p>
-                    <p>Арт-директор в IT-компании, практикующий дизайнер.</p>
+                    <img src="https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Elena Smirnova">
+                    <h3>Elena Smirnova</h3>
+                    <p class="teacher-subject" data-i18n="teachers.teacher3.subject">Dizayn, UI/UX, Figma</p>
+                    <p data-i18n="teachers.teacher3.info">IT kompaniyasida Art-direktor, amaliyotchi dizayner.</p>
                 </div>
             </div>
         </div>
@@ -128,14 +136,14 @@
     <!-- Контакты и запись -->
     <section class="contacts section" id="contacts">
         <div class="container">
-            <h2 class="section-title">Запись на курсы</h2>
+            <h2 class="section-title" data-i18n="contacts.title">Kurslarga yozilish</h2>
             <div class="contacts-container">
                 <div class="contact-info">
-                    <h3>Контакты</h3>
-                    <p><i class="fas fa-map-marker-alt"></i> г. Город, ул. Центральная, 123</p>
-                    <p><i class="fas fa-phone"></i> +7 (XXX) XXX-XX-XX</p>
-                    <p><i class="fas fa-envelope"></i> info@progress-center.ru</p>
-                    <p><i class="fas fa-clock"></i> Пн-Пт: 9:00-20:00, Сб-Вс: 10:00-18:00</p>
+                    <h3 data-i18n="contacts.info_title">Aloqa</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> <span data-i18n="contacts.address">Shahar, Markaziy ko'cha, 123</span></p>
+                    <p><i class="fas fa-phone"></i> +998 (XX) XXX-XX-XX</p>
+                    <p><i class="fas fa-envelope"></i> info@progress-markaz.uz</p>
+                    <p><i class="fas fa-clock"></i> <span data-i18n="contacts.worktime">Dushanba-Juma: 9:00-20:00, Shanba-Yakshanba: 10:00-18:00</span></p>
                     <div class="social">
                         <a href="#"><i class="fab fa-vk"></i></a>
                         <a href="#"><i class="fab fa-telegram"></i></a>
@@ -144,24 +152,24 @@
                     </div>
                 </div>
                 <form class="contact-form" id="contactForm">
-                    <h3>Оставьте заявку</h3>
+                    <h3 data-i18n="contacts.form_title">Ariza qoldiring</h3>
                     <div class="form-group">
-                        <input type="text" id="name" placeholder="Ваше имя" required>
+                        <input type="text" id="name" placeholder="Ismingiz" data-i18n-placeholder="form.name" required>
                     </div>
                     <div class="form-group">
-                        <input type="tel" id="phone" placeholder="Номер телефона" required>
+                        <input type="tel" id="phone" placeholder="Telefon raqami" data-i18n-placeholder="form.phone" required>
                     </div>
                     <div class="form-group">
                         <select id="course">
-                            <option value="" disabled selected>Выберите курс</option>
-                            <option value="Английский язык">Английский язык</option>
-                            <option value="Программирование">Программирование</option>
-                            <option value="Дизайн">Дизайн</option>
-                            <option value="Подготовка к экзаменам">Подготовка к экзаменам</option>
+                            <option value="" disabled selected data-i18n="form.course_select">Kursni tanlang</option>
+                            <option value="Ingliz tili">Ingliz tili</option>
+                            <option value="Dasturlash">Dasturlash</option>
+                            <option value="Dizayn">Dizayn</option>
+                            <option value="Imtihonlarga tayyorlov">Imtihonlarga tayyorlov</option>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Отправить заявку</button>
-                    <p class="form-note">Мы перезвоним вам в течение 2 часов</p>
+                    <button type="submit" class="btn btn-primary btn-block" data-i18n="form.submit">Arizani yuborish</button>
+                    <p class="form-note" data-i18n="form.note">Biz sizga 2 soat ichida qayta aloqaga chiqamiz</p>
                 </form>
             </div>
         </div>
@@ -172,14 +180,15 @@
         <div class="container footer-container">
             <div class="footer-logo">
                 <i class="fas fa-graduation-cap"></i>
-                <span>УЦ <strong>Прогресс</strong></span>
+                <span>OM <strong>Progress</strong></span>
             </div>
-            <p class="footer-copyright">© 2023 Учебный Центр "Прогресс". Все права защищены.</p>
-            <p class="footer-made">Сайт создан для демонстрации возможностей</p>
+            <p class="footer-copyright" data-i18n="footer.copyright">© 2023 "Progress" O'quv Markazi. Barcha huquqlar himoyalangan.</p>
+            <p class="footer-made" data-i18n="footer.made">Sayt imkoniyatlarni namoyish qilish uchun yaratilgan</p>
         </div>
     </footer>
 
     <!-- Скрипты -->
     <script src="script.js"></script>
+    <script src="language.js"></script>
 </body>
 </html>
