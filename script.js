@@ -86,4 +86,33 @@ function loadDirections() {
     const currentLang = window.currentLang || 'uz';
     const container = document.getElementById('directionsContainer');
     
-   
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    directionsData[currentLang].forEach(direction => {
+        const directionCard = document.createElement('div');
+        directionCard.className = 'direction-card';
+        
+        directionCard.innerHTML = `
+            <div class="direction-icon">
+                <i class="${direction.icon}"></i>
+            </div>
+            <div class="direction-content">
+                <h3>${direction.title}</h3>
+                <p>${direction.description}</p>
+                <div class="direction-details">
+                    <p><small>${direction.details}</small></p>
+                </div>
+                <a href="#contacts" class="btn btn-secondary">${currentLang === 'uz' ? 'Batafsil' : 'Узнать подробнее'}</a>
+            </div>
+        `;
+        
+        container.appendChild(directionCard);
+    });
+}
+
+// Экспортируем функции
+if (typeof window !== 'undefined') {
+    window.loadDirections = loadDirections;
+}
