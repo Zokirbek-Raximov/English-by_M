@@ -107,18 +107,27 @@ let currentLang = 'uz';
 
 function translatePage(lang) {
     currentLang = lang;
+    
+    // Сохраняем язык в localStorage
     localStorage.setItem('preferredLang', lang);
     
-    document.getElementById('currentLang').textContent = lang.toUpperCase();
+    // Обновляем текст кнопки переключения
+    const currentLangElement = document.getElementById('currentLang');
+    if (currentLangElement) {
+        currentLangElement.textContent = lang.toUpperCase();
+    }
+    
+    // Меняем атрибут lang у html
     document.documentElement.lang = lang;
     
+    // Меняем title страницы
     if (lang === 'uz') {
         document.title = "English by M | Sifatli ta'lim";
     } else {
         document.title = "English by M | Качественное образование";
     }
     
-    // Перевод текстов
+    // Переводим все элементы с data-i18n
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const key = element.getAttribute('data-i18n');
         if (translations[lang] && translations[lang][key]) {
@@ -126,7 +135,7 @@ function translatePage(lang) {
         }
     });
     
-    // Перевод placeholder'ов
+    // Переводим placeholder'ы
     document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
         const key = element.getAttribute('data-i18n-placeholder');
         if (translations[lang] && translations[lang][key]) {
@@ -134,22 +143,50 @@ function translatePage(lang) {
         }
     });
     
-    // Обновляем направления
-    if (typeof window.loadDirections === 'function') {
-        window.loadDirections();
-    }
+    // Обновляем текущий язык в глобальной области
+    window.currentLang = lang;
+    
+    // Обновляем направления обучения через 100ms (даём время на обновление DOM)
+    setTimeout(function() {
+        if (typeof window.loadDirections === 'function') {
+            console.log('Обновляем направления для языка:', lang);
+            window.loadDirections();
+        } else if (typeof window.loadSimpleDirections === 'function') {
+            console.log('Используем простую загрузку направлений');
+            window.loadSimpleDirections();
+        } else {
+            console.error('Функции загрузки направлений не найдены!');
+        }
+    }, 100);
+    
+    console.log('✅ Язык изменён на:', lang);
 }
 
+// Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', function() {
+    // Проверяем сохраненный язык
     const savedLang = localStorage.getItem('preferredLang') || 'uz';
+    
+    // Устанавливаем начальный язык
     translatePage(savedLang);
     
-    document.getElementById('langToggle').addEventListener('click', function() {
-        const newLang = currentLang === 'uz' ? 'ru' : 'uz';
-        translatePage(newLang);
-    });
+    // Назначаем обработчик кнопки переключения
+    const langToggle = document.getElementById('langToggle');
+    if (langToggle) {
+        langToggle.addEventListener('click', function() {
+            const newLang = currentLang === 'uz' ? 'ru' : 'uz';
+            translatePage(newLang);
+        });
+    }
     
+    // Делаем currentLang глобальной переменной для других файлов
     window.currentLang = currentLang;
     
     console.log('✅ Language system loaded for English by M');
 });
+
+// Экспортируем функции
+if (typeof window !== 'undefined') {
+    window.translatePage = translatePage;
+    window.currentLang = currentLang;
+}
