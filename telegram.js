@@ -2,8 +2,8 @@
 const BOT_TOKEN = '8506286493:AAE-mPIm05vH_KLPQ4mTdoPPlWj3gl4G-YM';
 const CHAT_ID = '8455664873';
 
-// Текущий язык (будет обновляться из language.js)
-let currentLang = 'uz';
+// НЕ объявляем currentLang здесь - она уже есть в language.js
+// let currentLang = 'uz'; // <-- УДАЛИТЬ ЭТУ СТРОКУ!
 
 // Функция отправки в Telegram
 async function sendToTelegram(formData) {
@@ -49,7 +49,8 @@ async function sendToTelegram(formData) {
 
 // Форматирование сообщения
 function formatTelegramMessage(data) {
-    const lang = data.lang || 'uz';
+    // Получаем currentLang из глобальной области
+    const lang = window.currentLang || 'uz';
     const time = new Date().toLocaleString('uz-UZ', {
         timeZone: 'Asia/Tashkent',
         hour12: false
@@ -128,6 +129,9 @@ function setupFormHandler() {
     newForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        // Получаем currentLang из глобальной области
+        const currentLang = window.currentLang || 'uz';
+        
         // Получаем данные формы
         const formData = {
             name: document.getElementById('name').value.trim(),
@@ -194,19 +198,11 @@ function setupFormHandler() {
             // Очищаем форму
             this.reset();
             document.getElementById('course').selectedIndex = 0;
-            
-            // Дополнительно: можно отправить в Google Analytics
-            if (typeof gtag !== 'undefined') {
-                gtag('event', 'form_submit', {
-                    'event_category': 'Заявка',
-                    'event_label': formData.course
-                });
-            }
         } else {
             showNotification(
                 currentLang === 'uz' 
-                    ? '❌ Xatolik yuz berdi. Iltimos, telefon orqali bog\'laning: +998 (XX) XXX-XX-XX' 
-                    : '❌ Ошибка отправки. Позвоните, пожалуйста: +998 (XX) XXX-XX-XX',
+                    ? '❌ Xatolik yuz berdi. Iltimos, telefon orqali bog\'laning.' 
+                    : '❌ Ошибка отправки. Позвоните, пожалуйста.',
                 'error'
             );
         }
@@ -218,13 +214,16 @@ function setupFormHandler() {
     });
 }
 
-// Обновляем текущий язык при переключении
+// Обновляем currentLang при переключении языка
 function updateCurrentLang(lang) {
-    currentLang = lang;
+    window.currentLang = lang;
 }
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
+    // Инициализируем глобальную переменную
+    window.currentLang = window.currentLang || 'uz';
+    
     // Настраиваем обработчик формы
     setupFormHandler();
     
@@ -235,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Обновляем currentLang после переключения
             setTimeout(() => {
                 const langText = document.getElementById('currentLang').textContent;
-                currentLang = langText.toLowerCase();
+                window.currentLang = langText.toLowerCase();
             }, 100);
         });
     }
