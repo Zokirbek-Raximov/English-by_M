@@ -1,26 +1,52 @@
-// telegram.js - English by M
+// telegram.js - ИСПРАВЛЕННЫЙ ВЕРСИЯ
 
+// ВАРИАНТ 1: Личный чат (если хотите получать заявки себе)
 const BOT_TOKEN = '8506286493:AAE-mPIm05vH_KLPQ4mTdoPPlWj3gl4G-YM';
-const CHAT_ID = '1003273735145';
+const CHAT_ID = '1003273735145'; // Ваш chat_id
 
-// Функция отправки в Telegram
+// ВАРИАНТ 2: Группа (если хотите чтобы все видели)
+// const CHAT_ID = '-1001234567890'; // ID группы (если есть)
+
+// Функция проверки chat_id
+async function testChatId(chatId) {
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/getChat?chat_id=${chatId}`;
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.ok) {
+            console.log(`✅ Чат найден: ${data.result.title || data.result.first_name}`);
+            console.log('Тип чата:', data.result.type);
+            return true;
+        } else {
+            console.error(`❌ Ошибка: ${data.description}`);
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Ошибка сети:', error);
+        return false;
+    }
+}
+
+// Улучшенная функция отправки
 async function sendToTelegram(formData) {
-    // Проверяем, все ли поля заполнены
     if (!formData.name || !formData.phone || !formData.course) {
         return false;
     }
     
-    // Форматируем сообщение
     const message = formatTelegramMessage(formData);
-    
-    // URL для отправки с CORS прокси
     const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+    
+    console.log('Отправляем в чат:', CHAT_ID);
+    console.log('Токен бота:', BOT_TOKEN.substring(0, 10) + '...');
     
     try {
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({
                 chat_id: CHAT_ID,
@@ -31,59 +57,74 @@ async function sendToTelegram(formData) {
         });
         
         const data = await response.json();
+        console.log('Ответ Telegram:', data);
         
         if (data.ok) {
-            console.log('✅ Заявка отправлена в Telegram от English by M');
+            console.log('✅ Заявка отправлена! ID:', data.result.message_id);
             return true;
         } else {
             console.error('❌ Ошибка Telegram:', data.description);
+            
+            // Попробуем альтернативные chat_id
+            if (data.description.includes('chat not found')) {
+                console.log('Пробуем альтернативные chat_id...');
+                return await tryAlternativeChatIds(formData);
+            }
             return false;
         }
     } catch (error) {
         console.error('❌ Ошибка сети:', error);
-        
-        // Альтернативный метод через прокси
-        try {
-            return await sendViaProxy(formData);
-        } catch (proxyError) {
-            console.error('❌ Ошибка прокси:', proxyError);
-            return false;
-        }
+        return false;
     }
 }
 
-// Альтернативная отправка через прокси
-async function sendViaProxy(formData) {
+// Пробуем разные chat_id
+async function tryAlternativeChatIds(formData) {
+    const alternativeChatIds = [
+        '1003273735145',    // Ваш указанный
+        '8455664873',       // Старый из кода
+        '-1001234567890'    // Пример ID группы
+    ];
+    
     const message = formatTelegramMessage(formData);
-    const proxyUrl = `https://corsproxy.io/?https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
     
-    const response = await fetch(proxyUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            chat_id: CHAT_ID,
-            text: message,
-            parse_mode: 'HTML'
-        })
-    });
+    for (const chatId of alternativeChatIds) {
+        console.log('Пробуем chat_id:', chatId);
+        
+        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'HTML'
+                })
+            });
+            
+            const data = await response.json();
+            if (data.ok) {
+                console.log(`✅ Успешно отправлено в chat_id: ${chatId}`);
+                // Сохраняем рабочий chat_id
+                localStorage.setItem('working_chat_id', chatId);
+                return true;
+            }
+        } catch (e) {
+            continue; // Пробуем следующий
+        }
+    }
     
-    const data = await response.json();
-    return data.ok;
+    return false;
 }
 
-// Форматирование сообщения для English by M
+// Форматирование сообщения (оставить как было)
 function formatTelegramMessage(data) {
     const lang = window.currentLang || 'uz';
     const time = new Date().toLocaleString('uz-UZ', {
         timeZone: 'Asia/Tashkent',
-        hour12: false,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
+        hour12: false
     });
     
     if (lang === 'ru') {
@@ -107,208 +148,23 @@ function formatTelegramMessage(data) {
     }
 }
 
-// Функция показа уведомления
-function showNotification(message, type = 'success') {
-    // Удаляем предыдущие уведомления
-    const oldNotifications = document.querySelectorAll('.notification');
-    oldNotifications.forEach(n => n.remove());
-    
-    // Создаем новое уведомление
-    const notification = document.createElement('div');
-    notification.className = `notification notification-${type}`;
-    notification.innerHTML = `
-        <div class="notification-content">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <span>${message}</span>
-        </div>
-        <button class="notification-close">&times;</button>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Автоудаление через 5 секунд
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.classList.add('fade-out');
-            setTimeout(() => {
-                if (notification.parentNode) notification.remove();
-            }, 300);
-        }
-    }, 5000);
-    
-    // Закрытие по клику
-    notification.querySelector('.notification-close').addEventListener('click', () => {
-        notification.remove();
-    });
-}
-
-// Обработчик формы для English by M
-function setupFormHandler() {
-    const form = document.getElementById('contactForm');
-    
-    if (!form) {
-        console.error('❌ Форма не найдена на сайте English by M!');
-        return;
-    }
-    
-    // Удаляем старые обработчики
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-    
-    // Добавляем новый обработчик
-    newForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        // Получаем текущий язык
-        const currentLang = window.currentLang || 'uz';
-        
-        // Получаем данные формы
-        const formData = {
-            name: document.getElementById('name').value.trim(),
-            phone: document.getElementById('phone').value.trim(),
-            course: document.getElementById('course').value,
-            lang: currentLang,
-            timestamp: new Date().toISOString(),
-            source: 'English by M Website'
-        };
-        
-        // Валидация
-        if (!formData.name || formData.name.length < 2) {
-            showNotification(
-                currentLang === 'uz' 
-                    ? '❌ Iltimos, ismingizni kiriting (kamida 2 harf)' 
-                    : '❌ Пожалуйста, введите имя (минимум 2 буквы)',
-                'error'
-            );
-            return;
-        }
-        
-        if (!formData.phone || formData.phone.replace(/\D/g, '').length < 9) {
-            showNotification(
-                currentLang === 'uz' 
-                    ? '❌ Iltimos, to\'g\'ri telefon raqam kiriting' 
-                    : '❌ Пожалуйста, введите корректный номер телефона',
-                'error'
-            );
-            return;
-        }
-        
-        if (!formData.course) {
-            showNotification(
-                currentLang === 'uz' 
-                    ? '❌ Iltimos, kursni tanlang' 
-                    : '❌ Пожалуйста, выберите курс',
-                'error'
-            );
-            return;
-        }
-        
-        // Визуальная обратная связь
-        const submitBtn = this.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        
-        submitBtn.innerHTML = currentLang === 'uz' 
-            ? '<i class="fas fa-spinner fa-spin"></i> Yuborilmoqda...' 
-            : '<i class="fas fa-spinner fa-spin"></i> Отправляем...';
-        submitBtn.disabled = true;
-        
-        // Отправляем в Telegram
-        const success = await sendToTelegram(formData);
-        
-        // Показываем результат
-        if (success) {
-            showNotification(
-                currentLang === 'uz' 
-                    ? '✅ English by M: Ariza qabul qilindi! 5-10 daqiqa ichida aloqaga chiqamiz.' 
-                    : '✅ English by M: Заявка принята! Свяжемся в течение 5-10 минут.',
-                'success'
-            );
-            
-            // Очищаем форму
-            this.reset();
-            document.getElementById('course').selectedIndex = 0;
-            
-            // Сохраняем в localStorage
-            saveToLocalStorage(formData);
-        } else {
-            showNotification(
-                currentLang === 'uz' 
-                    ? '❌ Xatolik yuz berdi. Iltimos, telefon orqali bog\'laning: +998 94 919-06-66' 
-                    : '❌ Ошибка отправки. Позвоните, пожалуйста: +998 94 919-06-66',
-                'error'
-            );
-        }
-        
-        // Восстанавливаем кнопку
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    });
-}
-
-// Сохранение в localStorage
-function saveToLocalStorage(formData) {
-    try {
-        const saved = JSON.parse(localStorage.getItem('englishbym_requests') || '[]');
-        saved.push({
-            ...formData,
-            savedAt: new Date().toISOString()
-        });
-        
-        // Храним только последние 20 заявок
-        if (saved.length > 20) {
-            saved = saved.slice(-20);
-        }
-        
-        localStorage.setItem('englishbym_requests', JSON.stringify(saved));
-        console.log('✅ Заявка сохранена в localStorage для English by M');
-    } catch (error) {
-        console.error('❌ Ошибка сохранения в localStorage:', error);
-    }
-}
-
-// Проверка доступности бота
-async function checkBotAvailability() {
-    try {
-        const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getMe`);
-        const data = await response.json();
-        
-        if (data.ok) {
-            console.log(`✅ Бот English by M активен: @${data.result.username}`);
-            return true;
-        } else {
-            console.error('❌ Бот English by M не доступен:', data.description);
-            return false;
-        }
-    } catch (error) {
-        console.error('❌ Ошибка проверки бота English by M:', error);
-        return false;
-    }
-}
-
-// Инициализация
+// Инициализация с проверкой
 document.addEventListener('DOMContentLoaded', function() {
-    // Настраиваем обработчик формы
-    setupFormHandler();
+    // Проверяем chat_id при загрузке
+    setTimeout(async () => {
+        console.log('🔍 Проверяем доступность чата...');
+        const isValid = await testChatId(CHAT_ID);
+        
+        if (!isValid) {
+            console.warn('⚠️ Текущий chat_id не работает. Проверьте альтернативы.');
+            showNotification(
+                window.currentLang === 'uz' 
+                    ? '⚠️ Telegram sozlamalari tekshirilmoqda...' 
+                    : '⚠️ Проверяем настройки Telegram...',
+                'error'
+            );
+        }
+    }, 2000);
     
-    // Проверяем бота при загрузке
-    setTimeout(checkBotAvailability, 2000);
-    
-    // Мониторим переключение языка
-    const langToggle = document.getElementById('langToggle');
-    if (langToggle) {
-        langToggle.addEventListener('click', function() {
-            setTimeout(() => {
-                const langText = document.getElementById('currentLang').textContent;
-                window.currentLang = langText.toLowerCase();
-            }, 100);
-        });
-    }
-    
-    console.log('✅ Telegram system loaded for English by M');
+    // ... остальной код инициализации
 });
-
-// Экспортируем функции
-if (typeof window !== 'undefined') {
-    window.sendToTelegram = sendToTelegram;
-    window.showNotification = showNotification;
-}
