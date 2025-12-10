@@ -1,3 +1,5 @@
+// language.js - переводы для English by_M
+
 // Словари перевода
 const translations = {
     uz: {
@@ -54,7 +56,7 @@ const translations = {
         "form.note": "Biz sizga 2 soat ichida qayta aloqaga chiqamiz",
         
         // Подвал
-        "footer.copyright": "© 2023 \"Progress\" O'quv Markazi. Barcha huquqlar himoyalangan.",
+        "footer.copyright": "© 2024 \"English by_M\" O'quv Markazi. Barcha huquqlar himoyalangan.",
         "footer.made": "Sayt imkoniyatlarni namoyish qilish uchun yaratilgan"
     },
     ru: {
@@ -111,7 +113,7 @@ const translations = {
         "form.note": "Мы перезвоним вам в течение 2 часов",
         
         // Подвал
-        "footer.copyright": "© 2023 Учебный Центр \"Прогресс\". Все права защищены.",
+        "footer.copyright": "© 2024 Учебный Центр \"English by_M\". Все права защищены.",
         "footer.made": "Сайт создан для демонстрации возможностей"
     }
 };
@@ -134,9 +136,9 @@ function translatePage(lang) {
     
     // Меняем title страницы
     if (lang === 'uz') {
-        document.title = "O'quv Markazi 'Progress' | Sifatli ta'lim";
+        document.title = "English by_M | Sifatli ta'lim";
     } else {
-        document.title = "Учебный Центр 'Прогресс' | Качественное образование";
+        document.title = "English by_M | Качественное образование";
     }
     
     // Переводим все элементы с data-i18n
@@ -156,119 +158,26 @@ function translatePage(lang) {
     });
     
     // Обновляем направления (вместе с языком)
-    updateDirectionsForLang(lang);
+    if (typeof window.loadDirections === 'function') {
+        window.loadDirections();
+    }
     
-    // Обновляем сообщение формы
-    updateFormMessage(lang);
+    // Обновляем год в подвале
+    updateFooterWithLang(lang);
 }
 
-// Функция обновления направлений в зависимости от языка
-function updateDirectionsForLang(lang) {
-    const directionsData = {
-        uz: [
-            {
-                title: "Ingliz tili",
-                description: "Umumiy kurs, biznes-ingliz, IT mutaxassislari uchun. Barcha darajalar Beginner'dan Advancedgacha.",
-                icon: "fas fa-language",
-                details: "Guruhlar: 6-8 kishi • Davomiylik: 3-9 oy • Sertifikat: bor"
-            },
-            {
-                title: "Dasturlash",
-                description: "Python, veb-dasturlash, algoritmlar asoslari. Birinchi darsdan real loyihalar ustida amaliyot.",
-                icon: "fas fa-code",
-                details: "Guruhlar: 6-8 kishi • Davomiylik: 4-10 oy • Ish bilan ta'minlash yordami"
-            },
-            {
-                title: "Dizayn va grafika",
-                description: "Photoshop, Figma, UI/UX dizayn. Amaliyotchi dizayner rahbarligida portfolio yaratish.",
-                icon: "fas fa-palette",
-                details: "Guruhlar: 6-8 kishi • Davomiylik: 3-6 oy • Diplom loyihasini himoya qilish"
-            },
-            {
-                title: "Imtihonlarga tayyorlov",
-                description: "IELTS, TOEFL, DT. Imtihoning barcha qismlarini tahlil qilish va test sinovlari bilan intensiv tayyorlov.",
-                icon: "fas fa-graduation-cap",
-                details: "Guruhlar: 4-6 kishi • Davomiylik: 2-6 oy • Natija kafolati"
-            }
-        ],
-        ru: [
-            {
-                title: "Английский язык",
-                description: "Общий курс, бизнес-английский, специализированный для IT. Все уровни от Beginner до Advanced.",
-                icon: "fas fa-language",
-                details: "Группы: 6-8 чел. • Длительность: 3-9 мес. • Сертификат: есть"
-            },
-            {
-                title: "Программирование",
-                description: "Python, веб-разработка, основы алгоритмов. Практика на реальных проектах с первого занятия.",
-                icon: "fas fa-code",
-                details: "Группы: 6-8 чел. • Длительность: 4-10 мес. • Помощь с трудоустройством"
-            },
-            {
-                title: "Дизайн и графика",
-                description: "Photoshop, Figma, UI/UX дизайн. Создание портфолио под руководством практикующего дизайнера.",
-                icon: "fas fa-palette",
-                details: "Группы: 6-8 чел. • Длительность: 3-6 мес. • Защита дипломного проекта"
-            },
-            {
-                title: "Подготовка к экзаменам",
-                description: "IELTS, TOEFL, ЕНТ. Интенсивная подготовка с разбором всех частей экзамена и пробными тестами.",
-                icon: "fas fa-graduation-cap",
-                details: "Группы: 4-6 чел. • Длительность: 2-6 мес. • Гарантия результата"
-            }
-        ]
-    };
+// Обновление подвала в зависимости от языка
+function updateFooterWithLang(lang) {
+    const year = new Date().getFullYear();
+    const copyrightElement = document.querySelector('.footer-copyright');
     
-    const container = document.getElementById('directionsContainer');
-    container.innerHTML = '';
-    
-    directionsData[lang].forEach(direction => {
-        const directionCard = document.createElement('div');
-        directionCard.className = 'direction-card';
-        
-        directionCard.innerHTML = `
-            <div class="direction-icon">
-                <i class="${direction.icon}"></i>
-            </div>
-            <div class="direction-content">
-                <h3>${direction.title}</h3>
-                <p>${direction.description}</p>
-                <div class="direction-details">
-                    <p><small>${direction.details}</small></p>
-                </div>
-                <a href="#contacts" class="btn btn-secondary">${lang === 'uz' ? 'Batafsil' : 'Узнать подробнее'}</a>
-            </div>
-        `;
-        
-        container.appendChild(directionCard);
-    });
-}
-
-// Функция обновления сообщения формы
-function updateFormMessage(lang) {
-    const form = document.getElementById('contactForm');
-    const oldSubmitHandler = form.onsubmit;
-    
-    form.onsubmit = function(e) {
-        e.preventDefault();
-        
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
-        const course = document.getElementById('course').value;
-        
-        let message = '';
+    if (copyrightElement) {
         if (lang === 'uz') {
-            message = `Rahmat, ${name}! "${course}" kursiga arizangiz qabul qilindi. Biz sizga ${phone} raqamiga 2 soat ichida qayta aloqaga chiqamiz.`;
+            copyrightElement.innerHTML = `© ${year} "English by_M" O'quv Markazi. Barcha huquqlar himoyalangan.`;
         } else {
-            message = `Спасибо, ${name}! Ваша заявка на курс "${course}" принята. Мы перезвоним вам по номеру ${phone} в течение 2 часов.`;
+            copyrightElement.innerHTML = `© ${year} Учебный Центр "English by_M". Все права защищены.`;
         }
-        
-        alert(message);
-        
-        // Очистка формы
-        this.reset();
-        document.getElementById('course').selectedIndex = 0;
-    };
+    }
 }
 
 // Инициализация при загрузке
@@ -285,44 +194,14 @@ document.addEventListener('DOMContentLoaded', function() {
         translatePage(newLang);
     });
     
-    // Добавляем текущий год в подвал
-    document.querySelector('.footer-copyright').innerHTML = 
-        currentLang === 'uz' 
-            ? `© ${new Date().getFullYear()} "Progress" O'quv Markazi. Barcha huquqlar himoyalangan.`
-            : `© ${new Date().getFullYear()} Учебный Центр "Прогресс". Все права защищены.`;
+    // Делаем currentLang глобальной переменной для других файлов
+    window.currentLang = currentLang;
+    
+    console.log('✅ Language system loaded for English by_M');
 });
-// После всего кода в language.js добавьте:
 
-// Экспортируем функцию смены языка для telegram.js
-function setCurrentLanguage(lang) {
-    currentLang = lang;
-    
-    // Если telegram.js загружен, обновляем его
-    if (typeof window.updateCurrentLang === 'function') {
-        window.updateCurrentLang(lang);
-    }
+// Экспортируем функции
+if (typeof window !== 'undefined') {
+    window.translatePage = translatePage;
+    window.currentLang = currentLang;
 }
-
-// Обновляем функцию translatePage
-const originalTranslatePage = translatePage;
-translatePage = function(lang) {
-    originalTranslatePage(lang);
-    setCurrentLanguage(lang);
-};
-
-// Инициализируем язык
-setCurrentLanguage(currentLang);
-// Делаем currentLang глобальной переменной
-window.currentLang = currentLang;
-
-// Обновляем функцию смены языка
-const originalTranslatePage = translatePage;
-translatePage = function(lang) {
-    originalTranslatePage(lang);
-    window.currentLang = lang; // Обновляем глобальную переменную
-    
-    // Если telegram.js загружен, обновляем его
-    if (typeof window.updateCurrentLang === 'function') {
-        window.updateCurrentLang(lang);
-    }
-};
