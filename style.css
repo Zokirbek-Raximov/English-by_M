@@ -305,7 +305,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* Преподаватели */
+/* Фото процесса обучения */
 .teachers-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -320,6 +320,11 @@ body {
     text-align: center;
     padding-bottom: 25px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+.teacher-card:hover {
+    transform: translateY(-5px);
 }
 
 .teacher-card img {
@@ -333,12 +338,6 @@ body {
     font-family: 'Roboto Slab', serif;
     color: #2c3e50;
     margin-bottom: 5px;
-}
-
-.teacher-subject {
-    color: #3498db;
-    font-weight: 600;
-    margin-bottom: 15px;
 }
 
 /* Контакты */
@@ -371,20 +370,73 @@ body {
     width: 20px;
 }
 
-.social {
-    margin-top: 30px;
-}
-
-.social a {
-    display: inline-block;
-    margin-right: 15px;
-    font-size: 1.5rem;
-    color: #7f8c8d;
+/* Ссылки на телефон и email */
+.phone-link, .email-link {
+    color: #333;
+    text-decoration: none;
     transition: color 0.3s;
 }
 
-.social a:hover {
+.phone-link:hover, .email-link:hover {
     color: #3498db;
+}
+
+/* Социальные сети */
+.social {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #f8f9fa;
+    color: #7f8c8d;
+    font-size: 1.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-link:hover {
+    transform: translateY(-5px);
+    color: white;
+}
+
+.social-link.telegram:hover {
+    background: #0088cc;
+    box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3);
+}
+
+.social-link.whatsapp:hover {
+    background: #25D366;
+    box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+}
+
+.social-link.instagram:hover {
+    background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+    box-shadow: 0 5px 15px rgba(193, 53, 132, 0.3);
+}
+
+.social-link i {
+    transition: transform 0.3s;
+}
+
+.social-link:hover i {
+    transform: scale(1.2);
+}
+
+.social-note {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Форма */
@@ -583,7 +635,7 @@ button[type="submit"]:disabled {
     }
     
     .nav-list {
-        display: none; /* В реальном проекте здесь будет бургер-меню */
+        display: none;
     }
     
     .btn-header {
@@ -606,6 +658,7 @@ button[type="submit"]:disabled {
     
     .contacts-container {
         grid-template-columns: 1fr;
+        padding: 25px;
     }
     
     /* Адаптивность для кнопки языка */
@@ -626,6 +679,17 @@ button[type="submit"]:disabled {
     
     .btn-header {
         margin-left: auto;
+    }
+    
+    /* Социальные сети на мобильных */
+    .social {
+        justify-content: center;
+    }
+    
+    .social-link {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
     }
     
     /* Адаптивность для уведомлений */
@@ -681,15 +745,15 @@ button[type="submit"]:disabled {
         font-size: 20px;
     }
     
-    .contacts-container {
-        padding: 25px;
-    }
-    
     .hero-buttons .btn {
         display: block;
         width: 100%;
         margin-right: 0;
         margin-bottom: 10px;
+    }
+    
+    .contact-info p {
+        font-size: 0.95rem;
     }
 }
 
@@ -703,22 +767,6 @@ button[type="submit"]:disabled {
 .direction-details small {
     color: #666;
     font-size: 0.9rem;
-}
-
-.social a i {
-    transition: transform 0.3s;
-}
-
-.social a:hover i {
-    transform: translateY(-3px);
-}
-
-.teacher-card {
-    transition: transform 0.3s;
-}
-
-.teacher-card:hover {
-    transform: translateY(-5px);
 }
 
 .feature-card p {
