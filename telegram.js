@@ -1,11 +1,12 @@
-// telegram.js - ИСПРАВЛЕННЫЙ (правильные HTML-теги)
+// telegram.js - РАБОЧИЙ КОД ДЛЯ ENGLISH BY M
+// Упрощенная версия без HTML ошибок
 
 const BOT_TOKEN = '8506286493:AAE-mPIm05vH_KLPQ4mTdoPPlWj3gl4G-YM';
 
 // ПРАВИЛЬНЫЕ CHAT_ID
 const WORKING_CHAT_IDS = [
-    '-1003273735145',  // ✅ Группа "Nomzodlar zapros boyicha"
-    '8455664873'       // ✅ Личный чат
+    '-1003273735145',  // Группа "Nomzodlar zapros boyicha"
+    '8455664873'       // Ваш личный чат
 ];
 
 // Основная функция отправки
@@ -29,7 +30,39 @@ async function sendToTelegram(formData) {
     return successCount > 0;
 }
 
-// Форматирование сообщения (ИСПРАВЛЕННЫЙ КОД)
+// Отправка в конкретный чат
+async function sendToChat(chatId, message) {
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message,
+                parse_mode: 'HTML' // Используем HTML, но БЕЗ ошибок
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.ok) {
+            console.log(`✅ Отправлено в ${getChatName(chatId)}`);
+            return true;
+        } else {
+            console.warn(`⚠️ Ошибка для ${chatId}:`, data.description);
+            return false;
+        }
+    } catch (error) {
+        console.error(`❌ Сетевая ошибка:`, error);
+        return false;
+    }
+}
+
+// Форматирование сообщения (ИСПРАВЛЕННАЯ ВЕРСИЯ)
 function formatTelegramMessage(data) {
     const lang = window.currentLang || 'uz';
     const time = new Date().toLocaleString('uz-UZ', {
@@ -41,75 +74,41 @@ function formatTelegramMessage(data) {
         minute: '2-digit'
     });
     
-    // Закодируем данные для безопасного использования в URL и HTML
-    const encodedName = encodeURIComponent(data.name);
-    const encodedCourse = encodeURIComponent(data.course);
-    const phoneForTel = data.phone.replace(/\s/g, ''); // Убираем пробелы для tel:
-    
-    // Ключевое исправление: корректно формируем URL для WhatsApp
-    // Экранируем кавычки " и амперсанд & внутри атрибута href
-    const whatsappUrlUz = `https://wa.me/998949190666?text=Assalomu%20alaykum!%20Men%20${encodedName}%2C%20%22${encodedCourse}%22%20kursiga%20ariza%20qoldirdim`;
-    const whatsappUrlRu = `https://wa.me/998949190666?text=Здравствуйте!%20Я%20${encodedName}%2C%20оставлял%20заявку%20на%20курс%20${encodedCourse}`;
-    
+    // Простое и безопасное форматирование
     if (lang === 'ru') {
-        return `🎓 <b>НОВАЯ ЗАЯВКА - English by M</b>\n\n` +
-               `👤 <b>Имя:</b> ${escapeHtml(data.name)}\n` +
-               `📞 <b>Телефон:</b> <code>${escapeHtml(data.phone)}</code>\n` +
-               `🎯 <b>Курс:</b> ${escapeHtml(data.course)}\n` +
-               `🌍 <b>Язык сайта:</b> Русский\n` +
-               `⏰ <b>Время:</b> ${time}\n` +
-               `📍 <b>Адрес:</b> Gazalkent, Musiqa va san'at maktabi\n\n` +
-               `🚀 <i>Свяжитесь в течение 10 минут!</i>\n\n` +
-               `📱 <a href="tel:${phoneForTel}">Позвонить</a> | ` +
-               `<a href="${whatsappUrlRu}">WhatsApp</a>`;
+        return `<b>🎓 НОВАЯ ЗАЯВКА - English by M</b>\n\n` +
+               `<b>👤 Имя:</b> ${escapeHtml(data.name)}\n` +
+               `<b>📞 Телефон:</b> <code>${escapeHtml(data.phone)}</code>\n` +
+               `<b>🎯 Курс:</b> ${escapeHtml(data.course)}\n` +
+               `<b>🌍 Язык сайта:</b> Русский\n` +
+               `<b>⏰ Время:</b> ${time}\n` +
+               `<b>📍 Адрес:</b> Gazalkent, Musiqa va san'at maktabi\n\n` +
+               `<i>🚀 Свяжитесь в течение 10 минут!</i>\n\n` +
+               `Телефон для связи: ${data.phone}\n` +
+               `WhatsApp: https://wa.me/998949190666`;
     } else {
-        return `🎓 <b>YANGI ARIZA - English by M</b>\n\n` +
-               `👤 <b>Ism:</b> ${escapeHtml(data.name)}\n` +
-               `📞 <b>Telefon:</b> <code>${escapeHtml(data.phone)}</code>\n` +
-               `🎯 <b>Kurs:</b> ${escapeHtml(data.course)}\n` +
-               `🌍 <b>Sayt tili:</b> O'zbek\n` +
-               `⏰ <b>Vaqt:</b> ${time}\n` +
-               `📍 <b>Manzil:</b> Gazalkent, Musiqa va san'at maktabi\n\n` +
-               `🚀 <i>10 daqiqa ichida aloqaga chiqing!</i>\n\n` +
-               `📱 <a href="tel:${phoneForTel}">Qo'ng'iroq qilish</a> | ` +
-               `<a href="${whatsappUrlUz}">WhatsApp</a>`;
+        return `<b>🎓 YANGI ARIZA - English by M</b>\n\n` +
+               `<b>👤 Ism:</b> ${escapeHtml(data.name)}\n` +
+               `<b>📞 Telefon:</b> <code>${escapeHtml(data.phone)}</code>\n` +
+               `<b>🎯 Kurs:</b> ${escapeHtml(data.course)}\n` +
+               `<b>🌍 Sayt tili:</b> O'zbek\n` +
+               `<b>⏰ Vaqt:</b> ${time}\n` +
+               `<b>📍 Manzil:</b> Gazalkent, Musiqa va san'at maktabi\n\n` +
+               `<i>🚀 10 daqiqa ichida aloqaga chiqing!</i>\n\n` +
+               `Bog'lanish uchun: ${data.phone}\n` +
+               `WhatsApp: https://wa.me/998949190666`;
     }
 }
 
-// Вспомогательная функция для экранирования HTML (добавьте её, если ещё нет)
+// Вспомогательная функция для экранирования HTML
 function escapeHtml(text) {
     if (!text) return '';
     return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-    
-    if (lang === 'ru') {
-        return `🎓 <b>НОВАЯ ЗАЯВКА - English by M</b>\n\n` +
-               `👤 <b>Имя:</b> ${data.name}\n` +
-               `📞 <b>Телефон:</b> <code>${data.phone}</code>\n` +
-               `🎯 <b>Курс:</b> ${data.course}\n` +
-               `🌍 <b>Язык сайта:</b> Русский\n` +
-               `⏰ <b>Время:</b> ${time}\n` +
-               `📍 <b>Адрес:</b> Gazalkent, Musiqa va san'at maktabi\n\n` +
-               `🚀 <i>Свяжитесь в течение 10 минут!</i>\n\n` +
-               `📱 <a href="tel:${phoneForTel}">Позвонить</a> | ` +
-               `<a href="https://wa.me/998949190666?text=Здравствуйте! Я ${encodedName}, оставлял заявку на курс ${encodedCourse}">WhatsApp</a>`;
-    } else {
-        return `🎓 <b>YANGI ARIZA - English by M</b>\n\n` +
-               `👤 <b>Ism:</b> ${data.name}\n` +
-               `📞 <b>Telefon:</b> <code>${data.phone}</code>\n` +
-               `🎯 <b>Kurs:</b> ${data.course}\n` +
-               `🌍 <b>Sayt tili:</b> O'zbek\n` +
-               `⏰ <b>Vaqt:</b> ${time}\n` +
-               `📍 <b>Manzil:</b> Gazalkent, Musiqa va san'at maktabi\n\n` +
-               `🚀 <i>10 daqiqa ichida aloqaga chiqing!</i>\n\n` +
-               `📱 <a href="tel:${phoneForTel}">Qo'ng'iroq qilish</a> | ` +
-               `<a href="https://wa.me/998949190666?text=Assalomu alaykum! Men ${encodedName}, "${encodedCourse}" kursiga ariza qoldirdim">WhatsApp</a>`;
-    }
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 // Вспомогательная функция
