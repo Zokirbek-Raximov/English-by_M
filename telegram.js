@@ -1,16 +1,16 @@
-// telegram.js - РАБОЧАЯ ВЕРСИЯ ДЛЯ ENGLISH BY M
+// telegram.js - ИСПРАВЛЕННЫЙ (правильные HTML-теги)
 
 const BOT_TOKEN = '8506286493:AAE-mPIm05vH_KLPQ4mTdoPPlWj3gl4G-YM';
 
-// ПРАВИЛЬНЫЕ CHAT_ID (с минусом для группы!)
+// ПРАВИЛЬНЫЕ CHAT_ID
 const WORKING_CHAT_IDS = [
-    '-1003273735145',  // ✅ Группа "Nomzodlar zapros boyicha" (ОСНОВНОЙ)
-    '8455664873'       // ✅ Ваш личный чат
+    '-1003273735145',  // ✅ Группа "Nomzodlar zapros boyicha"
+    '8455664873'       // ✅ Личный чат
 ];
 
 // Основная функция отправки
 async function sendToTelegram(formData) {
-    console.log('📤 Начинаем отправку заявки в Telegram...');
+    console.log('📤 Отправляем заявку...');
     
     if (!formData.name || !formData.phone || !formData.course) {
         console.error('❌ Не все поля заполнены');
@@ -20,20 +20,13 @@ async function sendToTelegram(formData) {
     const message = formatTelegramMessage(formData);
     let successCount = 0;
     
-    // Отправляем во все рабочие чаты
+    // Отправляем во все чаты
     for (const chatId of WORKING_CHAT_IDS) {
-        try {
-            const success = await sendToChat(chatId, message);
-            if (success) {
-                successCount++;
-                console.log(`✅ Отправлено в ${chatId}`);
-            }
-        } catch (error) {
-            console.warn(`⚠️ Ошибка при отправке в ${chatId}:`, error.message);
-        }
+        const success = await sendToChat(chatId, message);
+        if (success) successCount++;
     }
     
-    return successCount > 0; // Успех, если хотя бы в один чат отправлено
+    return successCount > 0;
 }
 
 // Отправка в конкретный чат
@@ -50,18 +43,17 @@ async function sendToChat(chatId, message) {
                 chat_id: chatId,
                 text: message,
                 parse_mode: 'HTML',
-                disable_web_page_preview: false,
-                disable_notification: false
+                disable_web_page_preview: false
             })
         });
         
         const data = await response.json();
         
         if (data.ok) {
-            console.log(`📨 Сообщение #${data.result.message_id} отправлено в ${getChatName(chatId)}`);
+            console.log(`✅ Отправлено в ${getChatName(chatId)}`);
             return true;
         } else {
-            console.warn(`⚠️ Telegram ошибка для ${chatId}:`, data.description);
+            console.warn(`⚠️ Ошибка для ${chatId}:`, data.description);
             return false;
         }
     } catch (error) {
@@ -70,7 +62,7 @@ async function sendToChat(chatId, message) {
     }
 }
 
-// Форматирование сообщения
+// Форматирование сообщения (ИСПРАВЛЕННЫЕ HTML-ТЕГИ)
 function formatTelegramMessage(data) {
     const lang = window.currentLang || 'uz';
     const time = new Date().toLocaleString('uz-UZ', {
@@ -82,6 +74,11 @@ function formatTelegramMessage(data) {
         minute: '2-digit'
     });
     
+    // Кодируем для URL
+    const encodedName = encodeURIComponent(data.name);
+    const encodedCourse = encodeURIComponent(data.course);
+    const phoneForTel = data.phone.replace(/\s/g, '');
+    
     if (lang === 'ru') {
         return `🎓 <b>НОВАЯ ЗАЯВКА - English by M</b>\n\n` +
                `👤 <b>Имя:</b> ${data.name}\n` +
@@ -91,8 +88,8 @@ function formatTelegramMessage(data) {
                `⏰ <b>Время:</b> ${time}\n` +
                `📍 <b>Адрес:</b> Gazalkent, Musiqa va san'at maktabi\n\n` +
                `🚀 <i>Свяжитесь в течение 10 минут!</i>\n\n` +
-               `📱 <a href="tel:${data.phone}">Позвонить</a> | ` +
-               `<a href="https://wa.me/998949190666?text=Здравствуйте! Я ${encodeURIComponent(data.name)}, оставлял заявку на курс ${encodeURIComponent(data.course)}">WhatsApp</a>`;
+               `📱 <a href="tel:${phoneForTel}">Позвонить</a> | ` +
+               `<a href="https://wa.me/998949190666?text=Здравствуйте! Я ${encodedName}, оставлял заявку на курс ${encodedCourse}">WhatsApp</a>`;
     } else {
         return `🎓 <b>YANGI ARIZA - English by M</b>\n\n` +
                `👤 <b>Ism:</b> ${data.name}\n` +
@@ -102,23 +99,22 @@ function formatTelegramMessage(data) {
                `⏰ <b>Vaqt:</b> ${time}\n` +
                `📍 <b>Manzil:</b> Gazalkent, Musiqa va san'at maktabi\n\n` +
                `🚀 <i>10 daqiqa ichida aloqaga chiqing!</i>\n\n` +
-               `📱 <a href="tel:${data.phone}">Qo'ng'iroq qilish</a> | ` +
-               `<a href="https://wa.me/998949190666?text=Assalomu alaykum! Men ${encodeURIComponent(data.name)}, "${encodeURIComponent(data.course)}" kursiga ariza qoldirdim">WhatsApp</a>`;
+               `📱 <a href="tel:${phoneForTel}">Qo'ng'iroq qilish</a> | ` +
+               `<a href="https://wa.me/998949190666?text=Assalomu alaykum! Men ${encodedName}, "${encodedCourse}" kursiga ariza qoldirdim">WhatsApp</a>`;
     }
 }
 
-// Вспомогательная функция для имени чата
+// Вспомогательная функция
 function getChatName(chatId) {
     switch(chatId) {
         case '-1003273735145': return 'Группа "Nomzodlar"';
-        case '8455664873': return 'Личный чат Zokirbek';
+        case '8455664873': return 'Личный чат';
         default: return chatId;
     }
 }
 
 // Функция показа уведомления на сайте
 function showSiteNotification(message, type = 'success') {
-    // Создаем элемент уведомления
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
@@ -131,7 +127,6 @@ function showSiteNotification(message, type = 'success') {
     
     document.body.appendChild(notification);
     
-    // Автоудаление через 5 секунд
     setTimeout(() => {
         if (notification.parentNode) {
             notification.classList.add('fade-out');
@@ -141,17 +136,15 @@ function showSiteNotification(message, type = 'success') {
         }
     }, 5000);
     
-    // Закрытие по клику
     notification.querySelector('.notification-close').addEventListener('click', () => {
         notification.remove();
     });
 }
 
-// Простая проверка подключения
+// Проверка подключения
 async function checkTelegramConnection() {
-    console.log('🔍 Проверяем подключение к Telegram...');
+    console.log('🔍 Проверяем бота...');
     
-    // Просто проверяем бота
     const url = `https://api.telegram.org/bot${BOT_TOKEN}/getMe`;
     
     try {
@@ -160,7 +153,6 @@ async function checkTelegramConnection() {
         
         if (data.ok) {
             console.log(`✅ Бот активен: @${data.result.username}`);
-            console.log(`📊 Готов к отправке в ${WORKING_CHAT_IDS.length} чата(ов)`);
             return true;
         } else {
             console.error('❌ Бот недоступен:', data.description);
@@ -177,14 +169,13 @@ function setupFormHandler() {
     const form = document.getElementById('contactForm');
     
     if (!form) {
-        console.error('❌ Форма не найдена на странице');
+        console.error('❌ Форма не найдена');
         return;
     }
     
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        // Получаем данные
         const currentLang = window.currentLang || 'uz';
         const formData = {
             name: document.getElementById('name').value.trim(),
@@ -193,7 +184,7 @@ function setupFormHandler() {
             lang: currentLang
         };
         
-        // Простая валидация
+        // Валидация
         if (!formData.name || formData.name.length < 2) {
             showSiteNotification(
                 currentLang === 'uz' 
@@ -224,7 +215,7 @@ function setupFormHandler() {
             return;
         }
         
-        // Показываем индикатор загрузки
+        // Индикатор загрузки
         const submitBtn = this.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = currentLang === 'uz' 
@@ -232,10 +223,10 @@ function setupFormHandler() {
             : '<i class="fas fa-spinner fa-spin"></i> Отправляем...';
         submitBtn.disabled = true;
         
-        // Отправляем в Telegram
+        // Отправляем
         const success = await sendToTelegram(formData);
         
-        // Обрабатываем результат
+        // Результат
         if (success) {
             showSiteNotification(
                 currentLang === 'uz' 
@@ -244,7 +235,6 @@ function setupFormHandler() {
                 'success'
             );
             
-            // Очищаем форму
             this.reset();
             document.getElementById('course').selectedIndex = 0;
         } else {
@@ -264,18 +254,14 @@ function setupFormHandler() {
 
 // Инициализация
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Инициализируем Telegram систему...');
+    console.log('🚀 Telegram система загружается...');
     
-    // Настраиваем форму
     setupFormHandler();
     
-    // Проверяем подключение
     setTimeout(() => {
         checkTelegramConnection();
     }, 1000);
     
-    console.log('✅ Telegram система готова к работе!');
-    console.log('📋 Будет отправлять в:');
-    console.log('  1. Группу: "-1003273735145" (Nomzodlar zapros boyicha)');
-    console.log('  2. Личный чат: "8455664873"');
+    console.log('✅ Telegram готов к работе');
+    console.log('📋 Chat IDs:', WORKING_CHAT_IDS);
 });
